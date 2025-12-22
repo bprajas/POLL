@@ -61,7 +61,7 @@ GENESIS_HASH = "0" * 64
 # UI
 # ===============================
 
-st.title("Local Voting System (One Vote)")
+st.title("E6 Panel Poll")
 
 st.markdown("**Candidate commitment hash:**")
 st.code(CANDIDATE_COMMIT_HASH)
