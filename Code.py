@@ -8,11 +8,12 @@ import time
 # ===============================
 
 CANDIDATES = {
-    "A": "Candidate Alpha",
-    "B": "Candidate Beta",
-    "C": "Candidate Gamma",
-    "D": "Candidate Delta",
-    "E": "Candidate Epsilon"
+    "Adwitiya": "Adwitiya",
+    "Atman": "Atman",
+    "Anaaya": "Anaaya",
+    "Sahana": "Sahana",
+    "Gauransh": "Gauransh",
+    "Swaraj": "Swaraj",
 }
 
 def hash_str(s):
@@ -21,9 +22,35 @@ def hash_str(s):
 CANDIDATE_COMMIT_HASH = hash_str(str(sorted(CANDIDATES.items())))
 
 VOTERS = {
-    "Alice": {"psk": "alpha123", "status": "unused"},
-    "Bob":   {"psk": "bravo456", "status": "unused"},
-    "Carol": {"psk": "charlie789", "status": "unused"},
+    "Adwitiya":   {"psk": "adwitiya", "status": "unused"},
+    "Anaaya":     {"psk": "anaaya", "status": "unused"},
+    "Atman":      {"psk": "atman", "status": "unused"},
+    "Aryan R":    {"psk": "aryanr", "status": "unused"},
+    "Anchita":    {"psk": "anchita", "status": "unused"},
+    "Arshiya":    {"psk": "arshiya", "status": "unused"},
+    "Aryan K":    {"psk": "aryank", "status": "unused"},
+    "Bhairavee":  {"psk": "bhairavee", "status": "unused"},
+    "Diva":       {"psk": "diva", "status": "unused"},
+    "Isha":       {"psk": "isha", "status": "unused"},
+    "Neha":       {"psk": "neha", "status": "unused"},
+    "Krishiv":    {"psk": "krishiv", "status": "unused"},
+    "Prajas":     {"psk": "prajas", "status": "unused"},
+    "Satyam":     {"psk": "satyam", "status": "unused"},
+    "Sahana":     {"psk": "sahana", "status": "unused"},
+    "Shreejani":  {"psk": "shreejani", "status": "unused"},
+    "Shriya":     {"psk": "shriya", "status": "unused"},
+    "Shazneen":   {"psk": "shazneen", "status": "unused"},
+    "Shreemayi":  {"psk": "shreemayi", "status": "unused"},
+    "Uttama":     {"psk": "uttama", "status": "unused"},
+    "Vishwanath": {"psk": "vishwanath", "status": "unused"},
+    "Arvind":     {"psk": "arvind", "status": "unused"},
+    "Rudra":      {"psk": "rudra", "status": "unused"},
+    "Ayush":      {"psk": "ayush", "status": "unused"},
+    "Swaraj":     {"psk": "swaraj", "status": "unused"},
+    "Gauransh":   {"psk": "gauransh", "status": "unused"},
+    "Unmesha":    {"psk": "unmesha", "status": "unused"},
+    "Nidhi":      {"psk": "nidhi", "status": "unused"},
+    "Aurobliss":  {"psk": "aurobliss", "status": "unused"},
 }
 
 LEDGER = []
