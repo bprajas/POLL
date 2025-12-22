@@ -68,7 +68,7 @@ for key in ["challenge", "name", "authenticated"]:
 # UI
 # ===============================
 
-st.title("Local Voting: Choose 3 Candidates")
+st.title("E6 Program Panel Poll")
 
 st.markdown("**Candidate commitment hash:**")
 st.code(CANDIDATE_COMMIT_HASH)
