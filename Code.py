@@ -2,11 +2,6 @@ import streamlit as st
 import hashlib
 import time
 
-# ===============================
-# CONFIGURATION
-# ===============================
-
-# ---- FIXED CANDIDATES ----
 CANDIDATES = [
     "Adwitiya",
     "Atman",
@@ -22,7 +17,6 @@ def hash_str(s):
 
 CANDIDATE_COMMIT_HASH = hash_str(str(sorted(CANDIDATES)))
 
-# ---- FIXED VOTERS (29) ----
 VOTERS = {
     "Adwitiya":   {"psk": "q7m4adw", "status": "unused"},
     "Anaaya":     {"psk": "n9a2kye", "status": "unused"},
@@ -58,10 +52,6 @@ VOTERS = {
 LEDGER = []
 GENESIS_HASH = "0" * 64
 
-# ===============================
-# UI
-# ===============================
-
 st.title("E6 Panel Poll")
 
 st.markdown("**Candidate commitment hash:**")
@@ -80,7 +70,6 @@ if st.button("Cast Vote"):
     elif psk != VOTERS[name]["psk"]:
         st.error("Authentication failed")
     else:
-        # ---- LOCK VOTER ----
         VOTERS[name]["status"] = "voted"
 
         prev_hash = LEDGER[-1]["hash"] if LEDGER else GENESIS_HASH
@@ -96,10 +85,6 @@ if st.button("Cast Vote"):
 
         st.success("Vote recorded. Voting access permanently closed.")
         st.stop()
-
-# ===============================
-# AUDIT
-# ===============================
 
 st.markdown("---")
 if st.checkbox("Show ledger (audit)"):
