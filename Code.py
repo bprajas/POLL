@@ -9,6 +9,7 @@ CANDIDATES = [
     "Sahana",
     "Gauransh",
     "Krishiv",
+    "Vishwanath",
     "Swaraj",
 ]
 
