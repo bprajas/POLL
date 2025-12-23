@@ -13,6 +13,7 @@ CANDIDATES = [
     "Anaaya",
     "Sahana",
     "Gauransh",
+    "Krishiv",
     "Swaraj",
 ]
 
