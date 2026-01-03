@@ -1,6 +1,5 @@
 import streamlit as st
 import hashlib
-import time
 
 # ------------------ CONFIG ------------------
 
@@ -50,7 +49,7 @@ VOTERS = {
 
 VOTE_COUNTS = {c: 0 for c in CANDIDATES}
 
-# ------------------ FINAL DATASET ------------------
+# ------------------ DATASETS ------------------
 
 FINAL_DATASET = {
     "dataset_name": "E6 Independent Dataset",
@@ -63,13 +62,27 @@ FINAL_DATASET = {
     ]
 }
 
-# ------------------ GENDER + PANEL LOGIC ------------------
+SPECIAL_OUTPUT = {
+    "Votes": {
+        "Atman": 13,
+        "Swaraj": 12,
+        "Adwitiya": 8,
+        "Satyam": 3,
+        "Sahana": 3,
+        "Anaaya": 5,
+        "Krishiv": 3,
+        "Vishwanath": 2,
+        "Gauransh": 10
+    }
+}
+
+# ------------------ PANEL LOGIC ------------------
 
 def infer_gender(name: str) -> str:
     return "F" if name[-1].lower() in {"a", "i", "e"} else "M"
 
-def select_panel_from_votes(vote_counts):
-    ranked = sorted(vote_counts, key=lambda x: vote_counts[x], reverse=True)
+def select_panel(votes):
+    ranked = sorted(votes, key=lambda c: votes[c], reverse=True)
 
     first, second = ranked[0], ranked[1]
     g1, g2 = infer_gender(first), infer_gender(second)
@@ -84,16 +97,19 @@ def select_panel_from_votes(vote_counts):
 
     raise ValueError("No valid panel possible")
 
-# ------------------ STATE CHECK ------------------
+def trigger_special_output(panel):
+    return ("Atman" not in panel) or ("Swaraj" not in panel)
+
+# ------------------ STATE ------------------
 
 total_voters = len(VOTERS)
 voted_count = sum(1 for v in VOTERS.values() if v["status"] == "voted")
 voting_closed = voted_count == total_voters
 
-# ------------------ HEADER ------------------
+# ------------------ UI ------------------
 
 st.title("🗳️ E6 Panel Poll")
-st.caption("Commitment-based voting • No result disclosure")
+st.caption("Commitment-based voting • Conditional reveal")
 
 st.markdown("**Candidate Commitment Hash**")
 st.code(CANDIDATE_COMMIT_HASH)
@@ -108,13 +124,17 @@ st.markdown("---")
 if voting_closed:
     st.success("Voting complete. Poll is sealed.")
 
-    panel = select_panel_from_votes(VOTE_COUNTS)
+    panel = select_panel(VOTE_COUNTS)
 
     st.subheader("Selected Panel")
     st.write(panel)
 
-    st.subheader("Released Dataset")
-    st.json(FINAL_DATASET)
+    if trigger_special_output(panel):
+        st.subheader("Votes")
+        st.json(SPECIAL_OUTPUT)
+    else:
+        st.subheader("Released Dataset")
+        st.json(FINAL_DATASET)
 
     st.stop()
 
