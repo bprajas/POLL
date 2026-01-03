@@ -2,10 +2,20 @@ import streamlit as st
 import hashlib
 import time
 
+# ------------------ CONFIG ------------------
+
+st.set_page_config(
+    page_title="E6 Panel Poll",
+    page_icon="🗳️",
+    layout="centered"
+)
+
+# ------------------ CORE DATA ------------------
+
 CANDIDATES = [
-    "Adwitiya", "Atman", "Anaaya", "Sahana",
-    "Gauransh", "Krishiv", "Vishwanath",
-    "Swaraj", "Satyam"
+    "Adwitiya", "Atman", "Anaaya",
+    "Sahana", "Gauransh", "Krishiv",
+    "Vishwanath", "Swaraj", "Satyam"
 ]
 
 def hash_str(s):
@@ -48,48 +58,75 @@ VOTERS = {
 LEDGER = []
 GENESIS_HASH = "0" * 64
 
-# ------------------ PREMADE DATASET ------------------
+# ------------------ FINAL DATASET ------------------
 
 FINAL_DATASET = {
-    "status": "Voting closed",
-    "message": "This dataset is independent of voting results.",
-    "data": [
-        {"x": 1, "y": 4},
-        {"x": 2, "y": 7},
-        {"x": 3, "y": 1},
-        {"x": 4, "y": 9}
+    "dataset_name": "E6 Independent Dataset",
+    "released_after": "All voters submitted ballots",
+    "values": [
+        {"t": 0, "value": 12},
+        {"t": 1, "value": 19},
+        {"t": 2, "value": 7},
+        {"t": 3, "value": 25},
     ]
 }
 
-# ------------------ UI LOGIC ------------------
+# ------------------ STATE CHECK ------------------
 
-st.title("E6 Panel Poll")
+total_voters = len(VOTERS)
+voted_count = sum(1 for v in VOTERS.values() if v["status"] == "voted")
+voting_closed = voted_count == total_voters
+
+# ------------------ HEADER ------------------
+
+st.title("🗳️ E6 Panel Poll")
+st.caption("Commitment-based voting • No result disclosure")
+
+st.markdown("**Candidate Commitment Hash**")
 st.code(CANDIDATE_COMMIT_HASH)
 
-# Check if voting is over
-if all(VOTERS[v]["status"] == "voted" for v in VOTERS):
-    st.success("Voting completed.")
+st.progress(voted_count / total_voters)
+st.caption(f"{voted_count} / {total_voters} voters have voted")
+
+st.markdown("---")
+
+# ------------------ PHASE 2: DATASET REVEAL ------------------
+
+if voting_closed:
+    st.success("Voting complete. Poll is permanently sealed.")
+    st.subheader("Released Dataset")
     st.json(FINAL_DATASET)
     st.stop()
 
-name = st.selectbox("Select your name", [""] + list(VOTERS.keys()))
-psk = st.text_input("Enter your secret", type="password")
+# ------------------ PHASE 1: VOTING ------------------
 
-choices = st.multiselect(
-    "Select EXACTLY 3 candidates",
-    CANDIDATES,
-    max_selections=3
-)
+left, right = st.columns(2)
 
-if st.button("Cast Vote"):
+with left:
+    st.subheader("Voter Authentication")
+    name = st.selectbox("Your name", [""] + list(VOTERS.keys()))
+    psk = st.text_input("Secret key", type="password")
+
+with right:
+    st.subheader("Ballot")
+    st.caption("Select exactly **3** candidates")
+    choices = st.multiselect(
+        "Candidates",
+        CANDIDATES,
+        max_selections=3
+    )
+
+st.markdown("---")
+
+if st.button("Submit Ballot", use_container_width=True):
     if name == "" or name not in VOTERS:
-        st.error("Invalid voter")
+        st.error("Invalid voter identity")
     elif VOTERS[name]["status"] == "voted":
-        st.error("You have already voted.")
+        st.error("Vote already cast. Access revoked.")
     elif psk != VOTERS[name]["psk"]:
         st.error("Authentication failed")
     elif len(choices) != 3:
-        st.error("You must select exactly 3 candidates.")
+        st.error("Exactly 3 selections are required.")
     else:
         VOTERS[name]["status"] = "voted"
 
@@ -104,9 +141,10 @@ if st.button("Cast Vote"):
         entry["hash"] = hash_str(str(entry))
         LEDGER.append(entry)
 
-        st.success("Vote recorded. Access revoked.")
+        st.success("Vote recorded. Voting rights permanently closed.")
         st.stop()
 
-st.markdown("---")
-if st.checkbox("Show ledger (audit)"):
+# ------------------ AUDIT ------------------
+
+with st.expander("Audit Ledger"):
     st.json(LEDGER)
