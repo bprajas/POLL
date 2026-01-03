@@ -55,7 +55,6 @@ VOTERS = {
     "Aurobliss":  {"psk": "a9u5rbl", "status": "unused"},
 }
 
-LEDGER = []
 GENESIS_HASH = "0" * 64
 
 # ------------------ FINAL DATASET ------------------
@@ -139,7 +138,6 @@ if st.button("Submit Ballot", use_container_width=True):
             "prev_hash": prev_hash
         }
         entry["hash"] = hash_str(str(entry))
-        LEDGER.append(entry)
 
         st.success("Vote recorded. Voting rights permanently closed.")
         st.stop()
