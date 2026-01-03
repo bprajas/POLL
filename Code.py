@@ -3,15 +3,9 @@ import hashlib
 import time
 
 CANDIDATES = [
-    "Adwitiya",
-    "Atman",
-    "Anaaya",
-    "Sahana",
-    "Gauransh",
-    "Krishiv",
-    "Vishwanath",
-    "Swaraj",
-    "Satyam"
+    "Adwitiya", "Atman", "Anaaya", "Sahana",
+    "Gauransh", "Krishiv", "Vishwanath",
+    "Swaraj", "Satyam"
 ]
 
 def hash_str(s):
@@ -54,30 +48,55 @@ VOTERS = {
 LEDGER = []
 GENESIS_HASH = "0" * 64
 
-st.title("E6 Panel Poll")
+# ------------------ PREMADE DATASET ------------------
 
-st.markdown("**Candidate commitment hash:**")
+FINAL_DATASET = {
+    "status": "Voting closed",
+    "message": "This dataset is independent of voting results.",
+    "data": [
+        {"x": 1, "y": 4},
+        {"x": 2, "y": 7},
+        {"x": 3, "y": 1},
+        {"x": 4, "y": 9}
+    ]
+}
+
+# ------------------ UI LOGIC ------------------
+
+st.title("E6 Panel Poll")
 st.code(CANDIDATE_COMMIT_HASH)
+
+# Check if voting is over
+if all(VOTERS[v]["status"] == "voted" for v in VOTERS):
+    st.success("Voting completed.")
+    st.json(FINAL_DATASET)
+    st.stop()
 
 name = st.selectbox("Select your name", [""] + list(VOTERS.keys()))
 psk = st.text_input("Enter your secret", type="password")
 
-choice = st.radio("Select ONE candidate", CANDIDATES)
+choices = st.multiselect(
+    "Select EXACTLY 3 candidates",
+    CANDIDATES,
+    max_selections=3
+)
 
 if st.button("Cast Vote"):
     if name == "" or name not in VOTERS:
         st.error("Invalid voter")
     elif VOTERS[name]["status"] == "voted":
-        st.error("You have already voted. Access permanently revoked.")
+        st.error("You have already voted.")
     elif psk != VOTERS[name]["psk"]:
         st.error("Authentication failed")
+    elif len(choices) != 3:
+        st.error("You must select exactly 3 candidates.")
     else:
         VOTERS[name]["status"] = "voted"
 
         prev_hash = LEDGER[-1]["hash"] if LEDGER else GENESIS_HASH
         entry = {
             "voter_hash": hash_str(name),
-            "choice": choice,
+            "choices": sorted(choices),
             "candidate_commitment": CANDIDATE_COMMIT_HASH,
             "timestamp": time.time(),
             "prev_hash": prev_hash
@@ -85,7 +104,7 @@ if st.button("Cast Vote"):
         entry["hash"] = hash_str(str(entry))
         LEDGER.append(entry)
 
-        st.success("Vote recorded. Voting access permanently closed.")
+        st.success("Vote recorded. Access revoked.")
         st.stop()
 
 st.markdown("---")
