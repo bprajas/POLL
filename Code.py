@@ -11,6 +11,7 @@ CANDIDATES = [
     "Krishiv",
     "Vishwanath",
     "Swaraj",
+    "Satyam"
 ]
 
 def hash_str(s):
