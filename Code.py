@@ -141,8 +141,3 @@ if st.button("Submit Ballot", use_container_width=True):
 
         st.success("Vote recorded. Voting rights permanently closed.")
         st.stop()
-
-# ------------------ AUDIT ------------------
-
-with st.expander("Audit Ledger"):
-    st.json(LEDGER)
