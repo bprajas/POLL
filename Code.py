@@ -46,7 +46,9 @@ VOTERS = {
     "Aurobliss":  {"psk": "a9u5rbl", "status": "unused"},
 }
 
-GENESIS_HASH = "0" * 64
+# ------------------ VOTE STORAGE ------------------
+
+VOTE_COUNTS = {c: 0 for c in CANDIDATES}
 
 # ------------------ FINAL DATASET ------------------
 
@@ -60,6 +62,27 @@ FINAL_DATASET = {
         {"t": 3, "value": 25},
     ]
 }
+
+# ------------------ GENDER + PANEL LOGIC ------------------
+
+def infer_gender(name: str) -> str:
+    return "F" if name[-1].lower() in {"a", "i", "e"} else "M"
+
+def select_panel_from_votes(vote_counts):
+    ranked = sorted(vote_counts, key=lambda x: vote_counts[x], reverse=True)
+
+    first, second = ranked[0], ranked[1]
+    g1, g2 = infer_gender(first), infer_gender(second)
+
+    if g1 != g2:
+        return [first, second, ranked[2]]
+
+    required = "F" if g1 == "M" else "M"
+    for c in ranked[2:]:
+        if infer_gender(c) == required:
+            return [first, second, c]
+
+    raise ValueError("No valid panel possible")
 
 # ------------------ STATE CHECK ------------------
 
@@ -80,12 +103,19 @@ st.caption(f"{voted_count} / {total_voters} voters have voted")
 
 st.markdown("---")
 
-# ------------------ PHASE 2: DATASET REVEAL ------------------
+# ------------------ PHASE 2: REVEAL ------------------
 
 if voting_closed:
-    st.success("Voting complete. Poll is permanently sealed.")
+    st.success("Voting complete. Poll is sealed.")
+
+    panel = select_panel_from_votes(VOTE_COUNTS)
+
+    st.subheader("Selected Panel")
+    st.write(panel)
+
     st.subheader("Released Dataset")
     st.json(FINAL_DATASET)
+
     st.stop()
 
 # ------------------ PHASE 1: VOTING ------------------
@@ -112,23 +142,15 @@ if st.button("Submit Ballot", use_container_width=True):
     if name == "" or name not in VOTERS:
         st.error("Invalid voter identity")
     elif VOTERS[name]["status"] == "voted":
-        st.error("Vote already cast. Access revoked.")
+        st.error("Vote already cast")
     elif psk != VOTERS[name]["psk"]:
         st.error("Authentication failed")
     elif len(choices) != 3:
-        st.error("Exactly 3 selections are required.")
+        st.error("Exactly 3 selections required")
     else:
         VOTERS[name]["status"] = "voted"
+        for c in choices:
+            VOTE_COUNTS[c] += 1
 
-        prev_hash = LEDGER[-1]["hash"] if LEDGER else GENESIS_HASH
-        entry = {
-            "voter_hash": hash_str(name),
-            "choices": sorted(choices),
-            "candidate_commitment": CANDIDATE_COMMIT_HASH,
-            "timestamp": time.time(),
-            "prev_hash": prev_hash
-        }
-        entry["hash"] = hash_str(str(entry))
-
-        st.success("Vote recorded. Voting rights permanently closed.")
+        st.success("Vote recorded. Access revoked.")
         st.stop()
