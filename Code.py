@@ -109,7 +109,7 @@ voting_closed = voted_count == total_voters
 # ------------------ UI ------------------
 
 st.title("🗳️ E6 Panel Poll")
-st.caption("Commitment-based voting • Conditional reveal")
+st.caption("VOTE")
 
 st.markdown("**Candidate Commitment Hash**")
 st.code(CANDIDATE_COMMIT_HASH)
